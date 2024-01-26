@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RPGSln.Dtos.Character;
 using RPGSln.Models;
 using RPGSln.Services.CharacterService;
 
@@ -22,7 +23,7 @@ namespace RPGSln.Controllers
 
         [HttpGet("GetAll")]
 
-        public async Task<ActionResult<ServiceResponse<List<Character>>>> Get()
+        public async Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> Get()
         {
             return Ok(await characterService.GetAllCharacters());
         }
@@ -30,7 +31,7 @@ namespace RPGSln.Controllers
         // Get Character  by Id
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ServiceResponse<List<Character>>>> GetSingleCharacter(int id)
+        public async Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> GetSingleCharacter(int id)
         {
             return Ok(await characterService.GetCharacterById(id));
         }
@@ -38,7 +39,7 @@ namespace RPGSln.Controllers
         // Create character
 
         [HttpPost]
-        public async  Task<ActionResult<ServiceResponse<List<Character>>>> AddCharacter(Character newCharacter)
+        public async  Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> AddCharacter(AddCharacterDto newCharacter)
         {
             return Ok(await characterService.AddCharacter(newCharacter));
         }
