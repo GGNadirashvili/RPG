@@ -54,5 +54,18 @@ namespace RPGSln.Controllers
             }
             return Ok(response);
         }
+
+        [HttpDelete("{id}")] 
+        public async Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> DeleteCharacter(int id)
+        {
+            var response = await characterService.DeleteCharacter(id);
+            if (response.Data is null)
+            {
+                return NotFound();
+            }
+            return Ok(response);
+        }
+
     }
+
 }
