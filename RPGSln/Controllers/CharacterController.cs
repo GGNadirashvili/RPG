@@ -22,25 +22,25 @@ namespace RPGSln.Controllers
 
         [HttpGet("GetAll")]
 
-        public ActionResult<List<Character>> Get()
+        public async Task<ActionResult<List<Character>>> Get()
         {
-            return Ok(characterService.GetAllCharacters());
+            return Ok(await characterService.GetAllCharacters());
         }
 
         // Get Character  by Id
 
         [HttpGet("{id}")]
-        public ActionResult<List<Character>> GetSingleCharacter(int id)
+        public async Task<ActionResult<List<Character>>> GetSingleCharacter(int id)
         {
-            return Ok(characterService.GetCharacterById(id));
+            return Ok(await characterService.GetCharacterById(id));
         }
 
         // Create character
 
         [HttpPost]
-        public ActionResult<List<Character>> CreateCharacter(Character newCharacter)
+        public async  Task<ActionResult<List<Character>>> CreateCharacter(Character newCharacter)
         {
-            return Ok(characterService.AddCharacter(newCharacter));
+            return Ok(await characterService.AddCharacter(newCharacter));
         }
     }
 }
