@@ -44,5 +44,35 @@ namespace RPGSln.Services.CharacterService
             serviceResponse.Data = mapper.Map<GetCharacterDto>(character);
             return serviceResponse;
         }
+
+        public async Task<ServiceResponse<GetCharacterDto>> UpdateCharacter(UpdateCharacterDto updatedCharacter)
+        {
+            var serviceResponse = new ServiceResponse<GetCharacterDto>();
+
+            try
+            {
+                var character = characters.FirstOrDefault(c => c.Id == updatedCharacter.Id);
+                if (character is null)
+                {
+                    throw new Exception($"Character with Id: {updatedCharacter.Id} not found");
+                }
+                character.Name = updatedCharacter.Name;
+                character.HitPoints = updatedCharacter.HitPoints;
+                character.Strenght = updatedCharacter.Strenght;
+                character.Defense = updatedCharacter.Defense;
+                character.Class = updatedCharacter.Class;
+                character.Intelligence = updatedCharacter.Intelligence;
+
+                serviceResponse.Data = mapper.Map<GetCharacterDto>(character);
+
+                return serviceResponse;
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Succes = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
+        }
     }
 }

@@ -42,6 +42,17 @@ namespace RPGSln.Controllers
         public async  Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> AddCharacter(AddCharacterDto newCharacter)
         {
             return Ok(await characterService.AddCharacter(newCharacter));
+        }  
+        
+        [HttpPut]
+        public async  Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> UpdateCharacter(UpdateCharacterDto updatedCharacter)
+        {
+            var response = await characterService.UpdateCharacter(updatedCharacter);
+            if(response.Data is null)
+            {
+                return NotFound();
+            }
+            return Ok(response);
         }
     }
 }
