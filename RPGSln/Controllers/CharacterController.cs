@@ -22,7 +22,7 @@ namespace RPGSln.Controllers
 
         [HttpGet("GetAll")]
 
-        public async Task<ActionResult<List<Character>>> Get()
+        public async Task<ActionResult<ServiceResponse<List<Character>>>> Get()
         {
             return Ok(await characterService.GetAllCharacters());
         }
@@ -30,15 +30,15 @@ namespace RPGSln.Controllers
         // Get Character  by Id
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<List<Character>>> GetSingleCharacter(int id)
+        public async Task<ActionResult<ServiceResponse<List<Character>>>> GetSingleCharacter(int id)
         {
             return Ok(await characterService.GetCharacterById(id));
         }
-
+         
         // Create character
 
         [HttpPost]
-        public async  Task<ActionResult<List<Character>>> CreateCharacter(Character newCharacter)
+        public async  Task<ActionResult<ServiceResponse<List<Character>>>> AddCharacter(Character newCharacter)
         {
             return Ok(await characterService.AddCharacter(newCharacter));
         }
