@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using RPGSln.Data;
 using RPGSln.Dtos.Character;
 using RPGSln.Models;
 
@@ -6,27 +8,28 @@ namespace RPGSln.Services.CharacterService
 {
     public class CharacterService : ICharacterService
     {
-        private static List<Character> characters = new List<Character> {
-        new Character(),
-        new Character{Id = 1, Name = "Sam"}
-        };
+   
         private readonly IMapper mapper;
+        private readonly DataContext context;
 
-        public CharacterService(IMapper mapper)
+        public CharacterService(IMapper mapper, DataContext context)
         {
             this.mapper = mapper;
+            this.context = context;
         }
 
         public async Task<ServiceResponse<List<GetCharacterDto>>> AddCharacter(AddCharacterDto newCharacter)
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
-            //increase id
             var character = mapper.Map<Character>(newCharacter);
-            character.Id = characters.Max(c => c.Id) + 1;
 
             //add character
-            characters.Add(character);
-            serviceResponse.Data = characters.Select(c => mapper.Map<GetCharacterDto>(c)).ToList();
+            context.Characters.Add(character);
+            await context.SaveChangesAsync();
+
+
+            serviceResponse.Data =
+                await context.Characters.Select(c => mapper.Map<GetCharacterDto>(c)).ToListAsync();
             return serviceResponse;
         }
 
@@ -34,13 +37,15 @@ namespace RPGSln.Services.CharacterService
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
             try
-            {
-                var character =  characters.FirstOrDefault(c => c.Id == Id);
-                if(character is null)
+            { 
+                var character = await context.Characters.FirstOrDefaultAsync(c => c.Id == Id);
+                if (character is null)
                     throw new Exception($"Character with Id: {Id} not found");
-                characters.Remove(character);
+                context.Characters.Remove(character);
 
-                serviceResponse.Data = characters.Select(c => mapper.Map<GetCharacterDto>(c)).ToList();
+                await context.SaveChangesAsync();
+                serviceResponse.Data 
+                    = await context.Characters.Select(c => mapper.Map<GetCharacterDto>(c)).ToListAsync();
 
             }
             catch (Exception ex)
@@ -54,15 +59,19 @@ namespace RPGSln.Services.CharacterService
         public async Task<ServiceResponse<List<GetCharacterDto>>> GetAllCharacters()
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
-            serviceResponse.Data = characters.Select(c => mapper.Map<GetCharacterDto>(c)).ToList();
+
+            // get data from database
+            var dbCharacters = await context.Characters.ToListAsync();
+
+            serviceResponse.Data = dbCharacters.Select(c => mapper.Map<GetCharacterDto>(c)).ToList();
             return serviceResponse;
         }
 
         public async Task<ServiceResponse<GetCharacterDto>> GetCharacterById(int id)
         {
             var serviceResponse = new ServiceResponse<GetCharacterDto>();
-            var character = characters.FirstOrDefault(c => c.Id == id);
-            serviceResponse.Data = mapper.Map<GetCharacterDto>(character);
+            var dbCharacter = await context.Characters.FirstOrDefaultAsync(c => c.Id == id);
+            serviceResponse.Data = mapper.Map<GetCharacterDto>(dbCharacter);
             return serviceResponse;
         }
 
@@ -72,7 +81,8 @@ namespace RPGSln.Services.CharacterService
 
             try
             {
-                var character = characters.FirstOrDefault(c => c.Id == updatedCharacter.Id);
+                var character = 
+                    await context.Characters.FirstOrDefaultAsync(c => c.Id == updatedCharacter.Id);
 
                 if (character is null)
                 {
@@ -87,7 +97,7 @@ namespace RPGSln.Services.CharacterService
                 character.Intelligence = updatedCharacter.Intelligence;
 
                 serviceResponse.Data = mapper.Map<GetCharacterDto>(character);
-
+                await context.SaveChangesAsync();
                 return serviceResponse;
             }
             catch (Exception ex)
