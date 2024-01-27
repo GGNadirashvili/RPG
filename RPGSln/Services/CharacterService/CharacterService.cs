@@ -35,7 +35,7 @@ namespace RPGSln.Services.CharacterService
             var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
             try
             {
-                var character = characters.FirstOrDefault(c => c.Id == Id);
+                var character =  characters.FirstOrDefault(c => c.Id == Id);
                 if(character is null)
                     throw new Exception($"Character with Id: {Id} not found");
                 characters.Remove(character);
