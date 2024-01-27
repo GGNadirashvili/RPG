@@ -11,9 +11,26 @@ namespace RPGSln.Data
         {
             this.context = context;
         }
-        public Task<ServiceResponse<string>> Login(User user, string password)
+        public async Task<ServiceResponse<string>> Login(string username, string password)
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<string>();
+            var user = await context.Users
+                .FirstOrDefaultAsync(u => u.UserName.ToLower().Equals(username.ToLower()));
+            if (user is null)
+            {
+                response.Succes = false;
+                response.Message = "User not found.";
+            }
+            else if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswrodSalt))
+            {
+                response.Succes = false;
+                response.Message = "Wrong Password.";
+            }
+            else
+            {
+                response.Data = user.Id.ToString();
+            }
+            return response;
         }
 
         public async Task<ServiceResponse<int>> Register(User user, string password)
@@ -46,13 +63,23 @@ namespace RPGSln.Data
             return false;
         }
 
-        // hash password
+        // Hash Password
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (var hmac = new System.Security.Cryptography.HMACSHA512())
             {
                 passwordSalt = hmac.Key;
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+
+        // Verify Password
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
             }
         }
     }
