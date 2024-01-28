@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using RPGSln.Dtos.Character;
 using RPGSln.Models;
 using RPGSln.Services.CharacterService;
+using System.Security.Claims;
 
 namespace RPGSln.Controllers
 {
@@ -26,7 +27,8 @@ namespace RPGSln.Controllers
 
         public async Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> Get()
         {
-            return Ok(await characterService.GetAllCharacters());
+            int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            return Ok(await characterService.GetAllCharacters(userId));
         }
 
         // Get Character  by Id
@@ -36,27 +38,27 @@ namespace RPGSln.Controllers
         {
             return Ok(await characterService.GetCharacterById(id));
         }
-         
+
         // Create character
 
         [HttpPost]
-        public async  Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> AddCharacter(AddCharacterDto newCharacter)
+        public async Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> AddCharacter(AddCharacterDto newCharacter)
         {
             return Ok(await characterService.AddCharacter(newCharacter));
-        }  
-        
+        }
+
         [HttpPut]
-        public async  Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> UpdateCharacter(UpdateCharacterDto updatedCharacter)
+        public async Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> UpdateCharacter(UpdateCharacterDto updatedCharacter)
         {
             var response = await characterService.UpdateCharacter(updatedCharacter);
-            if(response.Data is null)
+            if (response.Data is null)
             {
                 return NotFound();
             }
             return Ok(response);
         }
 
-        [HttpDelete("{id}")] 
+        [HttpDelete("{id}")]
         public async Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> DeleteCharacter(int id)
         {
             var response = await characterService.DeleteCharacter(id);

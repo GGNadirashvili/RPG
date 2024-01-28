@@ -56,12 +56,12 @@ namespace RPGSln.Services.CharacterService
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<GetCharacterDto>>> GetAllCharacters()
+        public async Task<ServiceResponse<List<GetCharacterDto>>> GetAllCharacters(int userId)
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
 
             // get data from database
-            var dbCharacters = await context.Characters.ToListAsync();
+            var dbCharacters = await context.Characters.Where(c => c.User.Id! == userId).ToListAsync();
 
             serviceResponse.Data = dbCharacters.Select(c => mapper.Map<GetCharacterDto>(c)).ToList();
             return serviceResponse;
