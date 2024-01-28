@@ -1,15 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RPGSln.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace RPGSln.Data
 {
     public class AuthRepository : IAuthRepository
     {
         private readonly DataContext context;
+        private readonly IConfiguration configuration;
 
-        public AuthRepository(DataContext context)
+        public AuthRepository(DataContext context, IConfiguration configuration)
         {
             this.context = context;
+            this.configuration = configuration;
         }
         public async Task<ServiceResponse<string>> Login(string username, string password)
         {
@@ -28,7 +33,7 @@ namespace RPGSln.Data
             }
             else
             {
-                response.Data = user.Id.ToString();
+                response.Data = CreateToken(user);
             }
             return response;
         }
@@ -82,5 +87,50 @@ namespace RPGSln.Data
                 return computedHash.SequenceEqual(passwordHash);
             }
         }
+
+        // Implement JWT 
+
+        private string CreateToken(User user)
+        {
+            // Creating a list to hold claims about the user
+            var claims = new List<Claim>
+             {
+        // Adding a claim for the user's unique identifier
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        
+        // Adding a claim for the user's username
+        new Claim(ClaimTypes.Name, user.UserName)
+               };
+
+            // Retrieving the secret key used to sign the token from app settings
+            var appSettingsToken = configuration.GetSection("AppSettings:Token").Value;
+            if (appSettingsToken is null)
+                throw new Exception("AppSettings Token is null");
+
+            // Creating a symmetric security key from the secret key
+            SymmetricSecurityKey key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
+                .GetBytes(appSettingsToken));
+
+            // Creating signing credentials using the key and HMAC-SHA512 algorithm
+            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            // Creating a token descriptor with the claims, expiration time, and signing credentials
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddDays(1),
+                SigningCredentials = creds
+            };
+
+            // Creating a JWT token handler
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+
+            // Creating a JWT token based on the token descriptor
+            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+
+            // Writing the JWT token to a string
+            return tokenHandler.WriteToken(token);
+        }
+
     }
 }
