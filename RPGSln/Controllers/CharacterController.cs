@@ -22,7 +22,6 @@ namespace RPGSln.Controllers
 
 
         // Get All Character
-
         [HttpGet("GetAll")]
 
         public async Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> Get()
