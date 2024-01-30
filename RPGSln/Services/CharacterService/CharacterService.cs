@@ -72,7 +72,8 @@ namespace RPGSln.Services.CharacterService
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<GetCharacterDto>>> GetAllCharacters()
+        public async Task<ServiceResponse<List<GetCharacterDto>>> 
+            GetAllCharacters()
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
 
