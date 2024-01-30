@@ -1,6 +1,10 @@
-﻿namespace RPGSln.Services.FightService
+﻿using RPGSln.Dtos.Fight;
+using RPGSln.Models;
+
+namespace RPGSln.Services.FightService
 {
     public interface IFightService
     {
+        Task<ServiceResponse<AttackResultDto>> WeaponAttack(WeaponAttackDto request);
     }
 }

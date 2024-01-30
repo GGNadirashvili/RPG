@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RPGSln.Dtos.Fight;
+using RPGSln.Models;
 using RPGSln.Services.FightService;
 
 namespace RPGSln.Controllers
@@ -16,6 +18,10 @@ namespace RPGSln.Controllers
             this.fightService = fightService;
         }
 
-
+        [HttpPost("Weapon")]
+        public async Task<ActionResult<ServiceResponse<AttackResultDto>>> WeaponAttack(WeaponAttackDto request)
+        {
+            return Ok(await fightService.WeaponAttack(request));
+        }
     }
 }
