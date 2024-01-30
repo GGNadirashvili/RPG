@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RPGSln.Dtos.Character;
+using RPGSln.Dtos.Weapon;
 using RPGSln.Models;
 
 namespace RPGSln
@@ -10,6 +11,7 @@ namespace RPGSln
         {
             CreateMap<Character, GetCharacterDto>().ReverseMap();
             CreateMap<Character, AddCharacterDto>().ReverseMap();
+            CreateMap<Weapon, GetWeaponDto>().ReverseMap();
         }
     }
 }
