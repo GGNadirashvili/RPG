@@ -28,10 +28,14 @@ namespace RPGSln.Controllers
         {
             return Ok(await fightService.SkillAttack(request));
         } 
-        [HttpPost("Fight")]
+        [HttpPost]
         public async Task<ActionResult<ServiceResponse<FightRequestDto>>> Fight(FightRequestDto request)
         {
             return Ok(await fightService.Fight(request));
+        } [HttpGet]
+        public async Task<ActionResult<ServiceResponse<List<HighScoreDto>>>> GetHighScore()
+        {
+            return Ok(await fightService.GetHighScore());
         }
     }
 }
